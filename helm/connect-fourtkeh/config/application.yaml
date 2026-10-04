@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=./application.schema.json
+# External Spring configuration; password is supplied only by a Secret environment variable.
+spring:
+  application:
+    name: connect-fourtkeh
+
+connect-fourtkeh:
+  application-name: Connect Fourtkeh
+  analytics:
+    enabled: true
+    release: 0.1.0-SNAPSHOT
+    storage:
+      path: /data/analytics
+      retention: 60d
+    segments:
+      max-uncompressed-size: 32MB
+      roll-at-utc-day-boundary: true
+    writer:
+      queue-capacity: 20000
+      flush-interval: 1s
+    compression:
+      enabled: true
+      algorithm: gzip
+    snapshots:
+      interval: 1m
+    client-activity:
+      heartbeat-interval: 20s
+      ttl: 45s
+    query:
+      workers: 2
+      queue-capacity: 4
+      timeout: 10s
+      cache-ttl: 10s
+      cache-entries: 32
+      max-accumulator-rows: 10000
+      max-retained-values: 250000
+  admin:
+    enabled: true
+    username: admin
+    session-timeout: 2h
+  chat:
+    max-messages-per-room: 100
+    max-message-length: 200
+    max-messages-per-window: 5
+    rate-window: 10s
+  game:
+    default-turn-time: 60s
+    allowed-turn-times:
+      - 15s
+      - 30s
+      - 60s
+      - 120s
+    allow-unlimited: true
+    timeout-strike-limit: 3
+    reconnect-timeout: 90s
+  rooms:
+    waiting-timeout: 30m
+    rematch-window: 60s
+    reconnect-grace: 30s
+    max-memberships-per-player: 4
+
+server:
+  port: 8080
+  shutdown: graceful
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      timeout: 2h
+      tracking-modes: cookie
+      cookie:
+        http-only: true
+        same-site: strict
+        # HTTPS ingress/Route required; override to false for local HTTP smoke tests.
+        secure: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+# Cap is optional: storage.max-total-size: 2GB; capacity can evict younger history.
+spring.lifecycle.timeout-per-shutdown-phase: 30s

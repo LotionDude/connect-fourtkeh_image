@@ -1,0 +1,11 @@
+{
+  "route": {
+    "enabled": true,
+    "host": "connect-fourtkeh.example.com",
+    "tls": {
+      "enabled": true,
+      "termination": "edge",
+      "insecureEdgeTerminationPolicy": "Redirect"
+    }
+  }
+}

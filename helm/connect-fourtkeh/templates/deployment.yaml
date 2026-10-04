@@ -1,0 +1,81 @@
+{{- if ne (int .Values.replicaCount) 1 }}{{ fail "Connect Fourtkeh requires exactly one replica" }}{{ end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "connect-fourtkeh.name" . }}
+  labels:
+    {{- include "connect-fourtkeh.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  # Never overlap processes owning in-memory games and the analytics directory.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "connect-fourtkeh.selector" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- with .Values.podLabels }}{{ toYaml . | nindent 8 }}{{ end }}
+        {{- include "connect-fourtkeh.selector" . | nindent 8 }}
+      annotations:
+        {{- with .Values.podAnnotations }}{{ toYaml . | nindent 8 }}{{ end }}
+        checksum/config: {{ .Files.Get "config/application.yaml" | sha256sum | quote }}
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 45
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: application
+          image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          args: ["--spring.config.additional-location=file:/config/application.yaml"]
+          {{- if .Values.admin.existingSecret }}
+          env:
+            - name: CONNECT_FOURTKEH_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.admin.existingSecret | quote }}
+                  key: {{ .Values.admin.passwordKey | quote }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+          startupProbe:
+            httpGet: {path: /actuator/health/liveness, port: http}
+            periodSeconds: 5
+            failureThreshold: 36
+          livenessProbe:
+            httpGet: {path: /actuator/health/liveness, port: http}
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: {path: /actuator/health/readiness, port: http}
+            periodSeconds: 5
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - {name: config, mountPath: /config, readOnly: true}
+            - {name: analytics, mountPath: /data/analytics}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "connect-fourtkeh.name" . }}-config
+        - name: tmp
+          emptyDir: {}
+        - name: analytics
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "connect-fourtkeh.name" .) | quote }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}

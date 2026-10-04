@@ -1,0 +1,450 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Supported Connect Fourtkeh application configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "connect-fourtkeh": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application-name": {
+          "type": "string",
+          "description": "Application display name.",
+          "minLength": 1
+        },
+        "game": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "default-turn-time": {
+              "type": "string",
+              "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+              "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+            },
+            "allowed-turn-times": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+                "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+              },
+              "description": "Must contain default-turn-time."
+            },
+            "allow-unlimited": {
+              "type": "boolean",
+              "description": "Allow unlimited game timers."
+            },
+            "timeout-strike-limit": {
+              "type": "integer",
+              "description": "Timeout strikes before forfeiture.",
+              "minimum": 1
+            },
+            "reconnect-timeout": {
+              "type": "string",
+              "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+              "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+            }
+          },
+          "required": []
+        },
+        "rooms": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "waiting-timeout": {
+              "type": "string",
+              "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+              "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+            },
+            "rematch-window": {
+              "type": "string",
+              "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+              "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+            },
+            "reconnect-grace": {
+              "type": "string",
+              "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+              "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+            },
+            "max-memberships-per-player": {
+              "type": "integer",
+              "description": "Concurrent room memberships.",
+              "minimum": 1
+            }
+          },
+          "required": []
+        },
+        "chat": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "max-messages-per-room": {
+              "type": "integer",
+              "description": "Bounded room-memory history.",
+              "minimum": 1
+            },
+            "max-message-length": {
+              "type": "integer",
+              "description": "Maximum Unicode code points.",
+              "minimum": 1
+            },
+            "max-messages-per-window": {
+              "type": "integer",
+              "description": "Rate limit per player/room.",
+              "minimum": 1
+            },
+            "rate-window": {
+              "type": "string",
+              "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+              "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+            }
+          },
+          "required": []
+        },
+        "admin": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable Admin when the external password is also supplied."
+            },
+            "username": {
+              "type": "string",
+              "description": "Single admin account name.",
+              "minLength": 1
+            },
+            "session-timeout": {
+              "type": "string",
+              "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+              "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+            }
+          },
+          "required": []
+        },
+        "analytics": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Telemetry enabled; failures degrade analytics, not gameplay."
+            },
+            "release": {
+              "type": "string",
+              "description": "Release label.",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "storage": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "description": "Writable mounted directory.",
+                  "minLength": 1
+                },
+                "retention": {
+                  "type": "string",
+                  "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+                  "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+                },
+                "max-total-size": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*(B|KB|MB|GB|TB)$",
+                  "description": "Positive Spring DataSize."
+                }
+              },
+              "required": []
+            },
+            "segments": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "max-uncompressed-size": {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]*(B|KB|MB|GB|TB)$",
+                  "description": "Positive Spring DataSize."
+                },
+                "roll-at-utc-day-boundary": {
+                  "type": "boolean",
+                  "description": "Roll segments at UTC midnight."
+                }
+              },
+              "required": []
+            },
+            "writer": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "queue-capacity": {
+                  "type": "integer",
+                  "description": "Bounded asynchronous queue.",
+                  "minimum": 1,
+                  "maximum": 1000000
+                },
+                "flush-interval": {
+                  "type": "string",
+                  "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+                  "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+                }
+              },
+              "required": []
+            },
+            "compression": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Compress finalized segments."
+                },
+                "algorithm": {
+                  "enum": [
+                    "gzip"
+                  ]
+                }
+              },
+              "required": []
+            },
+            "snapshots": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "interval": {
+                  "type": "string",
+                  "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+                  "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+                }
+              },
+              "required": []
+            },
+            "client-activity": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "heartbeat-interval": {
+                  "type": "string",
+                  "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+                  "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+                },
+                "ttl": {
+                  "type": "string",
+                  "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+                  "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+                }
+              },
+              "required": []
+            },
+            "query": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "workers": {
+                  "type": "integer",
+                  "description": "Bounded query workers.",
+                  "minimum": 1,
+                  "maximum": 8
+                },
+                "queue-capacity": {
+                  "type": "integer",
+                  "description": "Queued queries.",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "timeout": {
+                  "type": "string",
+                  "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+                  "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+                },
+                "cache-ttl": {
+                  "type": "string",
+                  "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+                  "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+                },
+                "cache-entries": {
+                  "type": "integer",
+                  "description": "Cached entries.",
+                  "minimum": 1,
+                  "maximum": 128
+                },
+                "max-accumulator-rows": {
+                  "type": "integer",
+                  "description": "Accumulator row budget.",
+                  "minimum": 1,
+                  "maximum": 50000
+                },
+                "max-retained-values": {
+                  "type": "integer",
+                  "description": "Exact numeric value budget.",
+                  "minimum": 1,
+                  "maximum": 1000000
+                }
+              },
+              "required": []
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    },
+    "spring": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "application": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Spring application name.",
+              "minLength": 1
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    },
+    "spring.lifecycle.timeout-per-shutdown-phase": {
+      "type": "string",
+      "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+      "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+    },
+    "server": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "port": {
+          "const": 8080,
+          "description": "Chart probes and named container port use 8080."
+        },
+        "shutdown": {
+          "enum": [
+            "graceful"
+          ]
+        },
+        "forward-headers-strategy": {
+          "enum": [
+            "framework",
+            "native",
+            "none"
+          ]
+        },
+        "servlet": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "session": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "timeout": {
+                  "type": "string",
+                  "pattern": "^(?:[1-9][0-9]*(?:ms|s|m|h|d)|P.+)$",
+                  "description": "Positive Spring duration. Runtime validates positivity and cross-field constraints."
+                },
+                "tracking-modes": {
+                  "type": "string",
+                  "enum": [
+                    "cookie"
+                  ]
+                },
+                "cookie": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "http-only": {
+                      "type": "boolean",
+                      "description": "HttpOnly session cookie."
+                    },
+                    "same-site": {
+                      "enum": [
+                        "strict",
+                        "lax",
+                        "none"
+                      ]
+                    },
+                    "secure": {
+                      "type": "boolean",
+                      "description": "True for production HTTPS."
+                    }
+                  },
+                  "required": []
+                }
+              },
+              "required": []
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    },
+    "management": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "endpoints": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "web": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "exposure": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "include": {
+                      "const": "health"
+                    }
+                  },
+                  "required": []
+                }
+              },
+              "required": []
+            }
+          },
+          "required": []
+        },
+        "endpoint": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "health": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "probes": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "enabled": {
+                      "const": true
+                    }
+                  },
+                  "required": []
+                },
+                "show-details": {
+                  "const": "never"
+                }
+              },
+              "required": []
+            }
+          },
+          "required": []
+        }
+      },
+      "required": []
+    }
+  },
+  "required": []
+}

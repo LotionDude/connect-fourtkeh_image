@@ -1,0 +1,252 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Connect Fourtkeh deployment",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "replicaCount": {
+      "const": 1,
+      "type": "integer",
+      "description": "Exactly one process owns in-memory games and analytics."
+    },
+    "image": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "Docker-compatible registry repository.",
+          "minLength": 1
+        },
+        "tag": {
+          "type": "string",
+          "description": "Already built image tag.",
+          "minLength": 1
+        },
+        "pullPolicy": {
+          "enum": [
+            "Always",
+            "IfNotPresent",
+            "Never"
+          ],
+          "description": "Image pull policy."
+        }
+      },
+      "required": [
+        "repository",
+        "tag",
+        "pullPolicy"
+      ]
+    },
+    "imagePullSecrets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Existing registry Secret name.",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "description": "Registry credentials in the namespace."
+    },
+    "service": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "port": {
+          "type": "integer",
+          "description": "ClusterIP HTTP/WebSocket service port.",
+          "minimum": 1,
+          "maximum": 65535
+        }
+      },
+      "required": [
+        "port"
+      ]
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Render an OpenShift Route only when enabled."
+        },
+        "host": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Empty or null lets OpenShift assign a hostname."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Kubernetes string metadata map."
+        },
+        "tls": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Use edge TLS at the router."
+            },
+            "termination": {
+              "const": "edge",
+              "description": "HTTP application supports edge termination."
+            },
+            "insecureEdgeTerminationPolicy": {
+              "enum": [
+                "Redirect",
+                "Allow",
+                "None"
+              ],
+              "description": "HTTP behavior at the TLS Route."
+            }
+          },
+          "required": [
+            "enabled",
+            "termination",
+            "insecureEdgeTerminationPolicy"
+          ]
+        }
+      },
+      "required": [
+        "enabled",
+        "annotations",
+        "tls"
+      ]
+    },
+    "persistence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "PVC for durable history; otherwise emptyDir at the same path."
+        },
+        "size": {
+          "type": "string",
+          "pattern": "^(?:[1-9][0-9]*(?:\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)(Ki|Mi|Gi|Ti|Pi|Ei|k|M|G|T|P|E)?$",
+          "description": "Positive Kubernetes storage quantity."
+        },
+        "storageClass": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Null uses cluster default; empty string disables dynamic provisioning."
+        },
+        "accessModes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "ReadWriteOnce",
+              "ReadWriteOncePod",
+              "ReadWriteMany"
+            ]
+          },
+          "description": "Access modes; the application still requires one writer."
+        },
+        "existingClaim": {
+          "type": "string",
+          "description": "Use an existing PVC instead of creating one."
+        }
+      },
+      "required": [
+        "enabled",
+        "size",
+        "accessModes",
+        "existingClaim"
+      ]
+    },
+    "admin": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "existingSecret": {
+          "type": "string",
+          "description": "Existing admin password Secret. Empty disables password injection."
+        },
+        "passwordKey": {
+          "type": "string",
+          "description": "Key containing the password.",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "existingSecret",
+        "passwordKey"
+      ]
+    },
+    "resources": {
+      "type": "object",
+      "description": "Initial CPU/memory budgets; tune with measured usage.",
+      "additionalProperties": false,
+      "properties": {
+        "requests": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Kubernetes string metadata map."
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Kubernetes string metadata map."
+        }
+      }
+    },
+    "podAnnotations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Kubernetes string metadata map."
+    },
+    "podLabels": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Kubernetes string metadata map."
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "description": "Pod security overrides; OpenShift assigns UID/group."
+    },
+    "containerSecurityContext": {
+      "type": "object",
+      "description": "Restricted defaults. No fixed runAsUser is required."
+    }
+  },
+  "required": [
+    "replicaCount",
+    "image",
+    "imagePullSecrets",
+    "service",
+    "route",
+    "persistence",
+    "admin",
+    "resources",
+    "podAnnotations",
+    "podLabels",
+    "podSecurityContext",
+    "containerSecurityContext"
+  ]
+}

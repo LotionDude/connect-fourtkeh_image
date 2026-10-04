@@ -1,0 +1,44 @@
+# Deployment settings only. Edit config/application.yaml for Spring settings.
+replicaCount: 1
+image:
+  repository: connect-fourtkeh
+  tag: "rc"
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+service:
+  port: 8080
+route:
+  enabled: false
+  host: ""
+  annotations: {}
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+persistence:
+  enabled: false
+  size: 2Gi
+  storageClass: null
+  accessModes: [ReadWriteOnce]
+  existingClaim: ""
+admin:
+  existingSecret: ""
+  passwordKey: password
+# Initial budgets, not benchmarks. JVM uses container-aware heap sizing.
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 768Mi
+podAnnotations: {}
+podLabels: {}
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+containerSecurityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: [ALL]
+  readOnlyRootFilesystem: true

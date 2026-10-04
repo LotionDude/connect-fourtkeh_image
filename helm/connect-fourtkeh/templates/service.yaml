@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "connect-fourtkeh.name" . }}
+  labels:
+    {{- include "connect-fourtkeh.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "connect-fourtkeh.selector" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
