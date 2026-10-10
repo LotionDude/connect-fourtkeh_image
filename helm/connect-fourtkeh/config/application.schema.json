@@ -289,6 +289,52 @@
             }
           },
           "required": []
+        },
+        "team-games": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "team-battle-width": {
+              "type": "integer",
+              "minimum": 7,
+              "maximum": 9
+            },
+            "gravity-clash-width": {
+              "type": "integer",
+              "minimum": 7,
+              "maximum": 9
+            },
+            "team-battle-height": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 8
+            },
+            "gravity-clash-height": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 8
+            },
+            "victory": {
+              "const": "COOPERATIVE"
+            }
+          },
+          "description": "Board dimensions must form a supported preset; validated at application startup."
+        },
+        "matchmaking": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled-modes": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "CLASSIC_1V1",
+                  "GRAVITY_CLASH_2V2"
+                ]
+              }
+            }
+          }
         }
       },
       "required": []

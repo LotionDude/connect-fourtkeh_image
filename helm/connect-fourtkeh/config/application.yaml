@@ -8,7 +8,7 @@ connect-fourtkeh:
   application-name: Connect Fourtkeh
   analytics:
     enabled: true
-    release: 0.1.0-SNAPSHOT
+    release: 2.0.0
     storage:
       path: /data/analytics
       retention: 60d
@@ -53,11 +53,21 @@ connect-fourtkeh:
     allow-unlimited: true
     timeout-strike-limit: 3
     reconnect-timeout: 90s
+  team-games:
+    team-battle-width: 8
+    team-battle-height: 7
+    gravity-clash-width: 8
+    gravity-clash-height: 6
+    victory: COOPERATIVE
+  matchmaking:
+    enabled-modes:
+      - CLASSIC_1V1
+      - GRAVITY_CLASH_2V2
   rooms:
     waiting-timeout: 30m
     rematch-window: 60s
     reconnect-grace: 30s
-    max-memberships-per-player: 4
+    max-memberships-per-player: 3
 
 server:
   port: 8080

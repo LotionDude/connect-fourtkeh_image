@@ -1,6 +1,6 @@
 apiVersion: v2
 name: connect-fourtkeh
 description: Single-process Connect Fourtkeh with file analytics
-version: 0.1.0
-appVersion: "0.1.0-SNAPSHOT"
+version: 2.0.0
+appVersion: "2.0.0"
 type: application

@@ -2,7 +2,7 @@
 replicaCount: 1
 image:
   repository: connect-fourtkeh
-  tag: "rc"
+  tag: "2.0.0"
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 service:

@@ -1,6 +1,6 @@
 services:
   connect-fourtkeh:
-    image: connect-fourtkeh:1.0.0
+    image: connect-fourtkeh:2.0.1
     restart: unless-stopped
     ports:
       - "${CONNECT_FOURTKEH_PORT:-8080}:8080"
@@ -8,7 +8,7 @@ services:
       CONNECT_FOURTKEH_ADMIN_PASSWORD: "${CONNECT_FOURTKEH_ADMIN_PASSWORD:-}"
     command:
       - --connect-fourtkeh.analytics.storage.path=/data/analytics
-      - --connect-fourtkeh.analytics.release=1.0.0
+      - --connect-fourtkeh.analytics.release=2.0.0
     volumes:
       - analytics:/data/analytics
 
